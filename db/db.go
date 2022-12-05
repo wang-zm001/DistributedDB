@@ -15,11 +15,11 @@ type Database struct {
 
 // NewDatabase returns an instance of a batabase that we can work with
 func NewDatabase(dataPath string) (db *Database, close func() error, err error) {
-	boltDB, err := bolt.Open("my.db", 0600, nil)
+	boltDB, err := bolt.Open(dataPath, 0600, nil)
 	if err != nil {
 		return nil, nil, err
 	}
-	
+
 	// cleanUpFunc := boltDB.Close
 	// defer func() {
 	// 	if cleanUpFunc != nil {
