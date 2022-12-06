@@ -1,14 +1,14 @@
-[[shard]]
+[[shards]]
 Name = "000"
 Idx = 0
 Address = "127.0.0.1:8080"
 
-[[shard]]
+[[shards]]
 Name = "001"
 Idx = 1
 Address = "127.0.0.1:8081"
 
-[[shard]]
+[[shards]]
 Name = '002'
 Idx = 2
 Address = "127.0.0.1:8082"
