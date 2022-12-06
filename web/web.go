@@ -80,6 +80,13 @@ func (s *Server) SetHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Set key success!, shardIdx is %d\n", shard)
 }
 
+// DeleteExtraKeys delete keys that don't belong to the current shard.
+func (s *Server) DeleteExtraKeysHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Error = %v", s.db.DeleteExtraKeys(func(key string) bool {
+		return s.shards.Index(key) != s.shards.CurIdx
+	}))
+}
+
 // ListenAndServe starts to accept the requests
 func (s *Server) ListenAndServe() error {
 	log.Printf("Server address is %s", s.shards.Addrs[s.shards.CurIdx])

@@ -51,6 +51,7 @@ func main() {
 
 	http.HandleFunc("/get", server.GetHandler)
 	http.HandleFunc("/set", server.SetHandler)
+	http.HandleFunc("/purge", server.DeleteExtraKeysHandler)
 
 	log.Fatal(server.ListenAndServe())
 }

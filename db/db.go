@@ -61,3 +61,33 @@ func (d *Database) GetKey(key string) ([]byte, error) {
 	}
 	return nil, err
 }
+
+// DeleteExtraKeys deletes the keys that not belong to this shard
+func (d *Database) DeleteExtraKeys(isExtra func(string) bool) error {
+	var keys []string
+
+	err := d.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(defaultBucket)
+		return b.ForEach(func(k, v []byte) error {
+			if isExtra(string(k)) {
+				keys = append(keys, string(k))	
+			}
+			return nil
+		})
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return d.db.Update(func (tx *bolt.Tx) error {
+		b := tx.Bucket(defaultBucket)
+
+		for _, k := range keys {
+			if err := b.Delete([]byte(k)); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
