@@ -1,14 +1,19 @@
 [[shards]]
-Name = "000"
+Name = "num0"
 Idx = 0
 Address = "127.0.0.1:8080"
 
 [[shards]]
-Name = "001"
+Name = "num1"
 Idx = 1
 Address = "127.0.0.1:8081"
 
 [[shards]]
-Name = '002'
+Name = 'num2'
 Idx = 2
 Address = "127.0.0.1:8082"
+
+[[shards]]
+Name = 'num3'
+Idx = 3
+Address = "127.0.0.1:8083"

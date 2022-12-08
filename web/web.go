@@ -29,7 +29,7 @@ func (s *Server) redirect(shard int, w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Get(url)
 	if err != nil {
 		w.WriteHeader(500)
-		fmt.Fprintf(w, "Error redircting the request: %v", err)
+		fmt.Fprintf(w, "Error redircting the request: %v\n", err)
 		return
 	}
 	defer resp.Body.Close()
@@ -82,7 +82,7 @@ func (s *Server) SetHandler(w http.ResponseWriter, r *http.Request) {
 
 // DeleteExtraKeys delete keys that don't belong to the current shard.
 func (s *Server) DeleteExtraKeysHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Error = %v", s.db.DeleteExtraKeys(func(key string) bool {
+	fmt.Fprintf(w, "Error = %v\n", s.db.DeleteExtraKeys(func(key string) bool {
 		return s.shards.Index(key) != s.shards.CurIdx
 	}))
 }

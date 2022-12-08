@@ -2,7 +2,7 @@ echo $RANDOM
 
 for shard in localhost:8080 localhost:8081; do
     echo $shard
-    for i in {1...1000}; do
-        echo curl "http://$shard/set?key=key-$RANDOM&value=value-$RANDOM"
-    done 
+    for i in {1..100}; do
+        curl "http://$shard/set?key=$RANDOM&value=$RANDOM"
+    done
 done
