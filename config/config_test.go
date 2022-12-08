@@ -1,7 +1,7 @@
 package config_test
 
 import (
-	"DistributedDB/config"
+	"github.com/wang-zm001/DistributedDB/config"
 	"os"
 	"reflect"
 	"testing"

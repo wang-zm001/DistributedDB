@@ -11,9 +11,9 @@ import (
 	"strings"
 	"testing"
 
-	"DistributedDB/config"
-	"DistributedDB/db"
-	"DistributedDB/web"
+	"github.com/wang-zm001/DistributedDB/config"
+	"github.com/wang-zm001/DistributedDB/db"
+	"github.com/wang-zm001/DistributedDB/web"
 )
 
 func createShardDb(t *testing.T, idx int) *db.Database {

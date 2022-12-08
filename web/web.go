@@ -1,8 +1,8 @@
 package web
 
 import (
-	"DistributedDB/config"
-	"DistributedDB/db"
+	"github.com/wang-zm001/DistributedDB/config"
+	"github.com/wang-zm001/DistributedDB/db"
 	"fmt"
 	"io"
 	"log"

@@ -1,7 +1,7 @@
 package db_test
 
 import (
-	"DistributedDB/db"
+	"github.com/wang-zm001/DistributedDB/db"
 	"reflect"
 	"testing"
 )
