@@ -101,7 +101,7 @@ func (d *Database) GetNextKeyForReplication() (key, value []byte, err error) {
 		key = make([]byte, len(k))
 		value = make([]byte, len(v))
 		copy(key, k)
-		copy(value, value)
+		copy(value, v)
 		return nil
 	})
 

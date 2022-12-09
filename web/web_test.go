@@ -38,6 +38,28 @@ func createShardDb(t *testing.T, idx int) *db.Database {
 	return db
 }
 
+// func createShardDbReplica(t *testing.T, idx int) *db.Database {
+// 	t.Helper()
+
+// 	tmpFile, err := os.CreateTemp(os.TempDir(), fmt.Sprintf("db%d-r", idx))
+// 	if err != nil {
+// 		t.Fatalf("Could not create a temp db-r %d: %v", idx, err)
+// 	}
+
+// 	tmpFile.Close()
+
+// 	name := tmpFile.Name()
+// 	t.Cleanup(func() { os.Remove(name) })
+
+// 	db, closeFunc, err := db.NewDatabase(name, true)
+// 	if err != nil {
+// 		t.Fatalf("Could not create new database %q: %v", name, err)
+// 	}
+// 	t.Cleanup(func() { closeFunc() })
+
+// 	return db
+// }
+
 func createShardServer(t *testing.T, idx int, addrs map[int]string) (*db.Database, *web.Server) {
 	t.Helper()
 

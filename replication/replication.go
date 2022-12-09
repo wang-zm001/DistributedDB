@@ -35,13 +35,13 @@ func ClientLoop(db *db.Database, leaderAddr string) {
 		}
 
 		if !present {
-			time.Sleep(time.Millisecond * 100)
+			time.Sleep(time.Second * 10)
 		}
 	}
 }
 
-func (c *client)loop () (present bool, err error) {
-	resp, err := http.Get("http://"+c.leaderAddr+"/next-replication-key")
+func (c *client) loop() (present bool, err error) {
+	resp, err := http.Get("http://" + c.leaderAddr + "/next-replication-key")
 	if err != nil {
 		return false, err
 	}
@@ -67,18 +67,18 @@ func (c *client)loop () (present bool, err error) {
 	if err := c.deleteFromReplicationQueue(res.Key, res.Value); err != nil {
 		log.Printf("DeleteKeyFromReplication failed: %v", err)
 	}
-	log.Printf("Next key value: %+v",res)
+	log.Printf("Next key value: %+v", res)
 	return false, nil
 }
 
-func (c *client) deleteFromReplicationQueue (key string, value string) error {
+func (c *client) deleteFromReplicationQueue(key string, value string) error {
 	u := url.Values{}
 	u.Set("key", key)
-	u.Set("Value", value)
+	u.Set("value", value)
 
 	log.Printf("Deleteing key=%q, value=%q from replication queue on %q", key, value, c.leaderAddr)
 
-	resp, err := http.Get("http://" + c.leaderAddr + "/delete-replication-key" + u.Encode())
+	resp, err := http.Get("http://" + c.leaderAddr + "/delete-replication-key?" + u.Encode())
 	if err != nil {
 		return err
 	}

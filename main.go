@@ -8,7 +8,7 @@ import (
 	"github.com/wang-zm001/DistributedDB/config"
 	"github.com/wang-zm001/DistributedDB/db"
 
-	// "github.com/wang-zm001/DistributedDB/replication"
+	"github.com/wang-zm001/DistributedDB/replication"
 	"github.com/wang-zm001/DistributedDB/web"
 )
 
@@ -52,13 +52,14 @@ func main() {
 	}
 	defer close()
 
-	// if *replica {
-	// 	leaderAddr, ok := shards.Addrs[shards.CurIdx]
-	// 	if !ok {
-	// 		log.Fatalf("Could not find address for leader for shard %d", shards.CurIdx)
-	// 	}
-	// 	go replication.ClientLoop(db, leaderAddr)
-	// }
+	if *replica {
+		leaderAddr, ok := shards.Addrs[shards.CurIdx]
+		if !ok {
+			log.Fatalf("Could not find address for leader for shard %d", shards.CurIdx)
+		}
+		log.Printf("leaderAddr is  %s", leaderAddr)
+		go replication.ClientLoop(db, leaderAddr)
+	}
 
 	server := web.NewServer(db, shards)
 	
