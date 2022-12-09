@@ -1,12 +1,15 @@
 package web
 
 import (
-	"github.com/wang-zm001/DistributedDB/config"
-	"github.com/wang-zm001/DistributedDB/db"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/wang-zm001/DistributedDB/config"
+	"github.com/wang-zm001/DistributedDB/db"
+	"github.com/wang-zm001/DistributedDB/replication"
 )
 
 // server contains HTTP method handlers to be used for the database
@@ -87,8 +90,36 @@ func (s *Server) DeleteExtraKeysHandler(w http.ResponseWriter, r *http.Request) 
 	}))
 }
 
+
+// GetNextKeyForReplication returns the next key for replication.
+func (s *Server) GetNextKeyForReplication(w http.ResponseWriter, r *http.Request) {
+	enc := json.NewEncoder(w)
+	k, v, err := s.db.GetNextKeyForReplication()
+	enc.Encode(&replication.NexKeyValue{
+		Key: string(k),
+		Value: string(v),
+		Err: err,
+	})
+}
+
+// DeleteExtraKeys delete the key from replica queue
+func (s *Server) DeleteReplicationKey(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	key := r.Form.Get("key")
+	value := r.Form.Get("value")
+
+	err := s.db.DeleteReplicationKey([]byte(key), []byte(value))
+	if err != nil {
+		w.WriteHeader(http.StatusExpectationFailed)
+		fmt.Fprintf(w, "error: %v", err)
+		return
+	}
+	fmt.Fprintf(w, "ok")
+}
+
 // ListenAndServe starts to accept the requests
-func (s *Server) ListenAndServe() error {
-	log.Printf("Server address is %s", s.shards.Addrs[s.shards.CurIdx])
-	return http.ListenAndServe(s.shards.Addrs[s.shards.CurIdx], nil)
+func (s *Server) ListenAndServe(httpAddr string) error {
+	log.Printf("Server address is %s", httpAddr)
+	return http.ListenAndServe(httpAddr, nil)
 }

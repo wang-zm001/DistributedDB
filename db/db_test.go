@@ -8,7 +8,7 @@ import (
 
 func TestSetAndGetKey(t *testing.T) {
 	dbName := "testDB"
-	db, close, err := db.NewDatabase(dbName)
+	db, close, err := db.NewDatabase(dbName, false)
 	if err != nil {
 		t.Fatalf("Create database fail: %v", err)
 	}

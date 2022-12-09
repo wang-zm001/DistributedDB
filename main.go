@@ -1,18 +1,23 @@
 package main
 
 import (
+	"flag"
+	"log"
+	"net/http"
+
 	"github.com/wang-zm001/DistributedDB/config"
 	"github.com/wang-zm001/DistributedDB/db"
+
+	// "github.com/wang-zm001/DistributedDB/replication"
 	"github.com/wang-zm001/DistributedDB/web"
-	"flag"   
- 	"log"
-	"net/http"
 )
 
 var (
 	dbLocation = flag.String("db-location", "./mydb", "The path to the bolt database")
 	configFile = flag.String("config-file", "sharding.toml", "Config file for static sharding")
-	shard      = flag.String("shard", "001", "The name of the shard for the data")
+	httpAddr   = flag.String("http-addr", "127.0.0.1:8080", "HTTP host and port")
+	shard      = flag.String("shard", "num0", "The name of the shard for the data")
+	replica    = flag.Bool("replica", false, "Whether or not run as a read-only replica")
 )
 
 func parseFlags() {
@@ -41,17 +46,28 @@ func main() {
 	}
 	log.Printf("Shard count is %d, current shard: %d\n", shards.Count, shards.CurIdx)
 
-	db, close, err := db.NewDatabase(*dbLocation)
-	defer close()
-
-	server := web.NewServer(db, shards)
+	db, close, err := db.NewDatabase(*dbLocation, *replica)
 	if err != nil {
 		log.Fatalf("NewDatabase(%q): %v\n", *dbLocation, err)
 	}
+	defer close()
 
+	// if *replica {
+	// 	leaderAddr, ok := shards.Addrs[shards.CurIdx]
+	// 	if !ok {
+	// 		log.Fatalf("Could not find address for leader for shard %d", shards.CurIdx)
+	// 	}
+	// 	go replication.ClientLoop(db, leaderAddr)
+	// }
+
+	server := web.NewServer(db, shards)
+	
 	http.HandleFunc("/get", server.GetHandler)
 	http.HandleFunc("/set", server.SetHandler)
 	http.HandleFunc("/purge", server.DeleteExtraKeysHandler)
+	http.HandleFunc("/next-replication-key", server.GetNextKeyForReplication)
+	http.HandleFunc("/delete-replication-key", server.DeleteReplicationKey)
 
-	log.Fatal(server.ListenAndServe())
+	// log.Fatal(http.ListenAndServe(*httpAddr, nil))
+	log.Fatal( server.ListenAndServe(*httpAddr))
 }
