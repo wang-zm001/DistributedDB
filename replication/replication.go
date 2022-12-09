@@ -35,7 +35,7 @@ func ClientLoop(db *db.Database, leaderAddr string) {
 		}
 
 		if !present {
-			time.Sleep(time.Second * 10)
+			time.Sleep(time.Millisecond * 10)
 		}
 	}
 }
