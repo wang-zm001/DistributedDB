@@ -1,23 +1,12 @@
 [[shards]]
 Name = "num0"
 Idx = 0
-Address = "127.0.0.1:8080"
+Address = "192.168.253.1:8080"
 Address-replica = ["127.0.0.1:8090"]
 
 [[shards]]
 Name = "num1"
 Idx = 1
-Address = "127.0.0.1:8081"
-Address-replica = ["127.0.0.2:8091"]
+Address = "192.168.253.4:8080"
+Address-replica = ["192.168.253.4:8090"]
 
-[[shards]]
-Name = 'num2'
-Idx = 2
-Address = "127.0.0.1:8082"
-Address-replica = ["127.0.0.1:8091"]
-
-[[shards]]
-Name = 'num3'
-Idx = 3
-Address = "127.0.0.1:8083"
-Address-replica = ["127.0.0.1:8093"]

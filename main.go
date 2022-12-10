@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	dbLocation = flag.String("db-location", "./mydb", "The path to the bolt database")
+	dbLocation = flag.String("db-location", "./db/file/mydb", "The path to the bolt database")
 	configFile = flag.String("config-file", "sharding.toml", "Config file for static sharding")
 	httpAddr   = flag.String("http-addr", "127.0.0.1:8080", "HTTP host and port")
 	shard      = flag.String("shard", "num0", "The name of the shard for the data")

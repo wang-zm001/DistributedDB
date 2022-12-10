@@ -57,9 +57,9 @@ func (s *Server) GetHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "GetKey error, the key is %s, err: %v\n", key, err)
 	}
 	if value == nil {
-		fmt.Fprintf(w, "there is no value of the key: %s\n", key)
+		fmt.Fprintf(w, "There is no value of the key: %s\n", key)
 	} else {
-		fmt.Fprintf(w, "the value of the key: %s is %s\n", key, value)
+		fmt.Fprintf(w, "The value of the key: %s is %s\n", key, value)
 	}
 }
 
@@ -90,15 +90,14 @@ func (s *Server) DeleteExtraKeysHandler(w http.ResponseWriter, r *http.Request) 
 	}))
 }
 
-
 // GetNextKeyForReplication returns the next key for replication.
 func (s *Server) GetNextKeyForReplication(w http.ResponseWriter, r *http.Request) {
 	enc := json.NewEncoder(w)
 	k, v, err := s.db.GetNextKeyForReplication()
 	enc.Encode(&replication.NexKeyValue{
-		Key: string(k),
+		Key:   string(k),
 		Value: string(v),
-		Err: err,
+		Err:   err,
 	})
 }
 

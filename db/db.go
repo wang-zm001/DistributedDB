@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	bolt "github.com/boltdb/bolt"
+	cache "github.com/wang-zm001/DistributedDB/cache"
 )
 
 var (
@@ -15,6 +16,7 @@ var (
 
 type Database struct {
 	db       *bolt.DB
+	cache    *cache.Cache
 	readOnly bool
 }
 
