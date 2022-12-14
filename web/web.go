@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/wang-zm001/DistributedDB/config"
+
 	"github.com/wang-zm001/DistributedDB/db"
 	"github.com/wang-zm001/DistributedDB/replication"
 )
@@ -26,9 +26,9 @@ func NewServer(db *db.Database, s *config.Shards) *Server {
 	}
 }
 
-func (s *Server) redirect(shard int, w http.ResponseWriter, r *http.Request) {
-	url := "http://" + s.shards.Addrs[shard] + r.RequestURI
-	fmt.Fprintf(w, "redirecting from shard %d to shard %d (%q)\n", s.shards.CurIdx, shard, url)
+func (s *Server) redirect(addr string, w http.ResponseWriter, r *http.Request) {
+	url := "http://" + addr + r.RequestURI
+	fmt.Fprintf(w, "redirecting from shard %s to shard %s (%q)\n", s.shards.CurAddr, addr, url)
 	resp, err := http.Get(url)
 	if err != nil {
 		w.WriteHeader(500)
@@ -47,12 +47,13 @@ func (s *Server) GetHandler(w http.ResponseWriter, r *http.Request) {
 
 	value, err := s.db.GetKey(key)
 
-	shard := s.shards.Index(key)
+	addr := s.shards.ShardMap.Get(key)
 
-	if shard != s.shards.CurIdx {
-		s.redirect(shard, w, r)
+	if addr != s.shards.CurAddr {
+		s.redirect(addr, w, r)
 		return
 	}
+
 	if err != nil {
 		fmt.Fprintf(w, "GetKey error, the key is %s, err: %v\n", key, err)
 	}
@@ -69,24 +70,24 @@ func (s *Server) SetHandler(w http.ResponseWriter, r *http.Request) {
 	key := r.Form.Get("key")
 	value := r.Form.Get("value")
 
-	shard := s.shards.Index(key)
+	addr := s.shards.ShardMap.Get(key)
 
-	if shard != s.shards.CurIdx {
-		s.redirect(shard, w, r)
+	if addr != s.shards.CurAddr {
+		s.redirect(addr, w, r)
 		return
 	}
 
 	err := s.db.SetKey(key, []byte(value))
 	if err != nil {
-		fmt.Fprintf(w, "SetKey error, the key is %s, err: %v, shardIdx is %d\n", key, err, shard)
+		fmt.Fprintf(w, "SetKey error, the key is %s, err: %v, shardIdx is %d\n", key, err, s.shards.CurIdx)
 	}
-	fmt.Fprintf(w, "Set key success!, shardIdx is %d\n", shard)
+	fmt.Fprintf(w, "Set key success!, shardIdx is %d\n", s.shards.CurIdx)
 }
 
 // DeleteExtraKeys delete keys that don't belong to the current shard.
 func (s *Server) DeleteExtraKeysHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Error = %v\n", s.db.DeleteExtraKeys(func(key string) bool {
-		return s.shards.Index(key) != s.shards.CurIdx
+		return s.shards.ShardMap.Get(key) != s.shards.CurAddr
 	}))
 }
 
@@ -115,10 +116,4 @@ func (s *Server) DeleteReplicationKey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprintf(w, "ok")
-}
-
-// ListenAndServe starts to accept the requests
-func (s *Server) ListenAndServe(httpAddr string) error {
-	log.Printf("Server address is %s", httpAddr)
-	return http.ListenAndServe(httpAddr, nil)
 }

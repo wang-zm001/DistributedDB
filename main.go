@@ -57,7 +57,7 @@ func main() {
 		if !ok {
 			log.Fatalf("Could not find address for leader for shard %d", shards.CurIdx)
 		}
-		log.Printf("leaderAddr is  %s", leaderAddr)
+		log.Printf("[Replication] address is %s, leaderAddr is  %s",*httpAddr, leaderAddr)
 		go replication.ClientLoop(db, leaderAddr)
 	}
 
@@ -69,6 +69,6 @@ func main() {
 	http.HandleFunc("/next-replication-key", server.GetNextKeyForReplication)
 	http.HandleFunc("/delete-replication-key", server.DeleteReplicationKey)
 
-	// log.Fatal(http.ListenAndServe(*httpAddr, nil))
-	log.Fatal( server.ListenAndServe(*httpAddr))
+	log.Printf("[main] Server address is %s", *httpAddr)
+	log.Fatal(http.ListenAndServe(*httpAddr, nil))
 }

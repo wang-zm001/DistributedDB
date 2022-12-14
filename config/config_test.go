@@ -1,10 +1,11 @@
 package config_test
 
 import (
-	"github.com/wang-zm001/DistributedDB/config"
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/wang-zm001/DistributedDB/config"
 )
 
 func GetConfig(t *testing.T, contents string) config.Config {
@@ -34,18 +35,30 @@ func GetConfig(t *testing.T, contents string) config.Config {
 
 func TestConfigParse(t *testing.T) {
 	contents := `[[shards]]
-	name = "000"
-	idx = 0
-	address = "localhost:7080"
+	Name = "db0"
+	Idx = 0
+	Address = "127.0.0.1:8080"
+	Address-replica = ["127.0.0.1:8090"]
+	
+	[[shards]]
+	Name = "db1"
+	Idx = 1
+	Address = "127.0.0.1:8081"
+	Address-replica = ["127.0.0.1:8091"]
 	`
 	got := GetConfig(t, contents)
 
 	want := config.Config{
 		Shards: []config.Shard{
 			{
-				Name:    "000",
+				Name:    "db0",
 				Idx:     0,
-				Address: "localhost:7080",
+				Address: "127.0.0.1:8080",
+			},
+			{
+				Name:    "db1",
+				Idx:     1,
+				Address: "127.0.0.1:8081",
 			},
 		},
 	}
@@ -58,33 +71,30 @@ func TestConfigParse(t *testing.T) {
 func TestParseShards(t *testing.T) {
 	contents := `
 	[[shards]]
-	name = "000"
-	idx = 0
-	address = "localhost:7080"
+	Name = "db0"
+	Idx = 0
+	Address = "127.0.0.1:8080"
+	Address-replica = ["127.0.0.1:8090"]
+	
 	[[shards]]
-	name = "001"
-	idx = 1
-	address = "localhost:7081"
-	[[shards]]
-	name = "002"
-	idx = 2
-	address = "localhost:7082"
+	Name = "db1"
+	Idx = 1
+	Address = "127.0.0.1:8081"
+	Address-replica = ["127.0.0.1:8091"]
 	`
 	c := GetConfig(t, contents)
 
-	got, err := config.ParseShards(c.Shards, "000")
+	got, err := config.ParseShards(c.Shards, "db0")
 	if err != nil {
 		t.Fatalf("Could not parse shards: %v", err)
 	}
 
+	shardMap := got.ShardMap
 	want := &config.Shards{
-		Addrs: map[int]string{
-			0: "localhost:7080",
-			1: "localhost:7081",
-			2: "localhost:7082",
-		},
-		Count: 3,
+		Count: 2,
 		CurIdx: 0,
+		CurAddr: "127.0.0.1:8080",
+		ShardMap: shardMap,
 	}
 
 	if !reflect.DeepEqual(got, want) {
